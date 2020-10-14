@@ -1,8 +1,66 @@
 <!DOCTYPE html>
 <body>
-  <form method="POST" action="/auth">
-    <label for="me">URL</label>
-    <input type="text" name="me" id="me" />
-    <button type="submit">Sign in</button>
-  </form>
 </body>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+      html {
+        box-sizing: border-box;
+      }
+      *, *:before, *:after {
+        box-sizing: inherit;
+      }
+      html, body {
+        margin: 0;
+        width: 100%;
+        font-size: 14px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .container {
+        margin: auto;
+        max-width: 320px;
+      }
+      .d-block {
+        display: block;
+      }
+      .mb-1 {
+        margin-bottom: 0.5em;
+      }
+      .mb-2 {
+        margin-bottom: 1em;
+      }
+      .full-width {
+        width: 100%;
+      }
+      button {
+        background: white;
+        border: 1px solid gray;
+        padding: 5px 10px; 
+      }
+
+      button.primary {
+        color: white;
+        background: #4caf50;
+      }
+
+      input[type=text] {
+        padding: 6px 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Login</h1>
+      <form method="POST" action="/auth">
+        <label for="me" class="d-block mb-1">URL</label>
+        <input type="text" name="me" id="me" class="d-block full-width mb-2" autofocus placeholder="https://example.com" />
+        <button type="submit" class="primary">Sign in</button>
+      </form>
+    </main>
+  </body>
+</html>
