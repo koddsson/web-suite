@@ -54,14 +54,11 @@ export async function getToken({
   }
 
   if (results.error_description) {
-    console.log(results);
     throw Error(results.error_description);
   } else if (results.error) {
-    console.log(results);
     throw Error(results.error);
   }
   if (!results.me || !results.scope || !results.access_token) {
-    console.log("resultsi: ", JSON.stringify(results));
     throw Error("The token endpoint did not return the expected parameters");
   }
   // Check "me" values have the same hostname

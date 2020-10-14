@@ -43,9 +43,7 @@ app.post("/post", async function (req, res) {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
     const location = response.headers.get("Location");
-    console.log(location);
     return res.redirect(location || "/");
   }
   return res.render("404.html");

@@ -44,7 +44,6 @@ app.get("/success", async function (req, res) {
     url: token_endpoint,
     code,
   });
-  console.log(token);
 
   // TODO: I need to do something clever with state.
   console.log(state);
