@@ -29,7 +29,7 @@ app.post("/", async function (req, res) {
     throw new Error("Couldn't find authorization endpoint.");
   }
 
-  const hash = createHash("md5");
+  const hash = createHash("sha256");
   hash.update(clientId);
   hash.update(redirectUri);
   const state = hash.toString();
@@ -51,7 +51,7 @@ app.post("/", async function (req, res) {
 app.get("/success", async function (req, res) {
   const { code, me, state } = req.query;
 
-  const compareState = createHash("md5");
+  const compareState = createHash("sha256");
   compareState.update(clientId);
   compareState.update(redirectUri);
   if (state !== compareState.toString()) {
@@ -74,7 +74,7 @@ app.get("/success", async function (req, res) {
     code,
   });
 
-  const hash = createHash("md5");
+  const hash = createHash("sha256");
   hash.update(code);
   hash.update(me);
 
