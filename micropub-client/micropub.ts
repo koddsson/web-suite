@@ -1,9 +1,6 @@
 // TODO: Fix all these imports
 import { parseDOM } from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/htmlparser2/index.ts";
-import {
-  find,
-  findAll,
-} from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/domutils/querying.ts";
+import { findAll } from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/domutils/querying.ts";
 import type { Element } from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/domhandler/index.ts";
 
 export async function getToken({
@@ -36,12 +33,6 @@ export async function getToken({
     },
   });
 
-  // TODO: Sometimes endpoints can return strging
-  // Parse the response from the indieauth server
-  // if (typeof result === "string") {
-  //   result = qsParse(result);
-  // }
-
   let results: { [key: string]: string } = {};
 
   if (res.headers.get("Content-Type") === "application/x-www-form-urlencoded") {
@@ -67,19 +58,17 @@ export async function getToken({
   if (urlResult.hostname != urlOptions.hostname) {
     throw Error("The me values do not share the same hostname");
   }
+
   // Successfully got the token
-  // TODO: Save this token?
-  //  this.options.token = result.access_token;
   return results.access_token;
 }
 
-export async function getEndpointsFromUrl(url: string) {
-  const endpoints = {
-    micropub: "",
-    authorization_endpoint: "",
-    token_endpoint: "",
-  };
+export interface Rel {
+  rel: string;
+  href: string;
+}
 
+export async function getEndpointsFromUrl(url: string): Promise<Rel[]> {
   // Fetch the given url
   const res = await fetch(url, {
     method: "GET",
@@ -89,34 +78,12 @@ export async function getEndpointsFromUrl(url: string) {
   });
 
   const html = parseDOM(await res.text());
-  const rels = findAll((el: Element) => el.tagName === "link", html);
+  const rels = Array.from(
+    findAll((element: Element) => element.tagName === "link", html)
+  ).map((element: Element) => {
+    const { rel, href } = element.attribs;
+    return { rel, href };
+  });
 
-  // TODO: This could be done better I think.
-  for (const rel of rels) {
-    if (rel.attribs["rel"] === "micropub") {
-      endpoints.micropub = rel.attribs["href"];
-    }
-    if (rel.attribs["rel"] === "token_endpoint") {
-      endpoints.token_endpoint = rel.attribs["href"];
-    }
-    if (rel.attribs["rel"] === "authorization_endpoint") {
-      endpoints.authorization_endpoint = rel.attribs["href"];
-    }
-  }
-
-  if (
-    endpoints.micropub &&
-    endpoints.authorization_endpoint &&
-    endpoints.token_endpoint
-  ) {
-    return {
-      authorization_endpoint: endpoints.authorization_endpoint,
-      token_endpoint: endpoints.token_endpoint,
-      micropub: endpoints.micropub,
-    };
-  }
-
-  throw new Error(
-    `Error getting microformats data. Endpoints: ${JSON.stringify(endpoints)}`
-  );
+  return rels;
 }

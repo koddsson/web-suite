@@ -1,8 +1,9 @@
 import opine from "https://deno.land/x/opine@0.21.2/mod.ts";
-import { getEndpointsFromUrl, getToken } from "./micropub.ts";
 import { createHash } from "https://deno.land/std/hash/mod.ts";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
+
 import { createCookie } from "./utils.ts";
+import { Rel, getEndpointsFromUrl, getToken } from "./micropub.ts";
 
 const clientId = Deno.env.get("CLIENT_ID") || "http://localhost:3000";
 const redirectUri =
@@ -18,7 +19,15 @@ const app = opine();
 
 app.post("/", async function (req, res) {
   const { me } = req.parsedBody;
-  const { authorization_endpoint } = await getEndpointsFromUrl(me);
+  const endpoints = await getEndpointsFromUrl(me);
+
+  const authorization_endpoint = endpoints.find(
+    (endpoint: Rel) => endpoint.rel === "authorization_endpoint"
+  );
+
+  if (!authorization_endpoint) {
+    throw new Error("Couldn't find authorization endpoint.");
+  }
 
   const params = new URLSearchParams({
     me,
@@ -28,7 +37,7 @@ app.post("/", async function (req, res) {
     state: "state", // TODO: Generate this better
   });
 
-  const url = new URL(authorization_endpoint);
+  const url = new URL(authorization_endpoint.href);
   url.search = `${params.toString()}&scope=create+update+media`; // TODO: Request scope correctly
 
   res.redirect(url.toString());
@@ -36,12 +45,19 @@ app.post("/", async function (req, res) {
 
 app.get("/success", async function (req, res) {
   const { code, me, state } = req.query;
-  const { token_endpoint } = await getEndpointsFromUrl(me);
+  const endpoints = await getEndpointsFromUrl(me);
+  const token_endpoint = endpoints.find(
+    (endpoint: Rel) => endpoint.rel === "token_endpoint"
+  );
+  if (!token_endpoint) {
+    throw new Error("Couldn't find token endpoint.");
+  }
+
   const token = await getToken({
     me,
     clientId,
     redirectUri,
-    url: token_endpoint,
+    url: token_endpoint.href,
     code,
   });
 
