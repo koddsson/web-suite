@@ -3,6 +3,7 @@ import { renderFileToString } from "https://deno.land/x/dejs@0.8.0/mod.ts";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
 import authentication from "./authentication.ts";
 import { getCookie } from "./utils.ts";
+import { Rel, getEndpointsFromUrl } from "./micropub.ts";
 
 // Open a database
 const db = new DB("./client.db");
@@ -17,7 +18,7 @@ app.use(urlencoded());
 
 app.get("/", async function (req, res) {
   const sessionId = getCookie(req.headers.get("Cookie") || "", "session");
-  const token = getToken(sessionId);
+  const { token } = getToken(sessionId);
   if (token) {
     return res.render("index.html");
   }
@@ -27,17 +28,25 @@ app.get("/", async function (req, res) {
 app.post("/post", async function (req, res) {
   const { note } = req.parsedBody;
   const sessionId = getCookie(req.headers.get("Cookie") || "", "session");
-  const token = getToken(sessionId);
+  const { token, me } = getToken(sessionId);
   if (token) {
-    // TODO: Get the endpoint actually from `me`.
-    const body = {
+    const endpoints = await getEndpointsFromUrl(me);
+    const micropub_endpoint = endpoints.find(
+      (endpoint: Rel) => endpoint.rel === "micropub"
+    );
+
+    if (!micropub_endpoint) {
+      throw new Error("Couldn't find micropub endpoint.");
+    }
+
+    const body = JSON.stringify({
       h: "entry",
       content: note,
-    };
+    });
 
-    const response = await fetch("https://koddsson.com/micropub", {
+    const response = await fetch(micropub_endpoint.href, {
       method: "POST",
-      body: JSON.stringify(body),
+      body,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -49,15 +58,17 @@ app.post("/post", async function (req, res) {
   return res.render("404.html");
 });
 
-function getToken(sessionId: string) {
+function getToken(sessionId: string): { token: string; me: string } {
   const results = [
     ...db
       .query("SELECT token, me FROM sessions WHERE id = ?", [sessionId])
       .asObjects(),
   ][0];
   if (results) {
-    return results.token;
+    const { token, me } = results;
+    return { token, me };
   }
+  return { token: "", me: "" };
 }
 
 app.use("/auth", authentication);
