@@ -29,12 +29,17 @@ app.post("/", async function (req, res) {
     throw new Error("Couldn't find authorization endpoint.");
   }
 
+  const hash = createHash("md5");
+  hash.update(clientId);
+  hash.update(redirectUri);
+  const state = hash.toString();
+
   const params = new URLSearchParams({
     me,
     client_id: clientId!,
     redirect_uri: redirectUri!,
     response_type: "code",
-    state: "state", // TODO: Generate this better
+    state,
   });
 
   const url = new URL(authorization_endpoint.href);
@@ -45,6 +50,14 @@ app.post("/", async function (req, res) {
 
 app.get("/success", async function (req, res) {
   const { code, me, state } = req.query;
+
+  const compareState = createHash("md5");
+  compareState.update(clientId);
+  compareState.update(redirectUri);
+  if (state !== compareState.toString()) {
+    throw new Error("State variable doesn't match given state");
+  }
+
   const endpoints = await getEndpointsFromUrl(me);
   const token_endpoint = endpoints.find(
     (endpoint: Rel) => endpoint.rel === "token_endpoint"
@@ -61,11 +74,10 @@ app.get("/success", async function (req, res) {
     code,
   });
 
-  // TODO: I need to do something clever with state.
-  console.log(state);
   const hash = createHash("md5");
   hash.update(code);
   hash.update(me);
+
   const id = hash.toString();
 
   db.query("INSERT INTO sessions VALUES(?, ?, ?)", [id, token, me]);
