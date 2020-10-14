@@ -1,7 +1,7 @@
 // TODO: Fix all these imports
-import { parseDOM } from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/htmlparser2/index.ts";
-import { findAll } from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/domutils/querying.ts";
-import type { Element } from "https://raw.githubusercontent.com/willconant/deno-htmlparser2/20200806_different_event_emitter/domhandler/index.ts";
+import { parseDOM } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/htmlparser2/index.ts";
+import { findAll } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domutils/querying.ts";
+import type { Element } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domhandler/index.ts";
 
 export async function getToken({
   me,
