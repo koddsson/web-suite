@@ -3,7 +3,14 @@
 
 name: CI
 
-on: push
+on:
+  push:
+    paths:
+      - 'koddsson.com/**'
+
+defaults:
+  run:
+    working-directory: koddsson.com
 
 jobs:
   test:
