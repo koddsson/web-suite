@@ -131,6 +131,10 @@ a {
 }
 
 @media (max-width: 568px) {
+  section.main {
+    width: 100%;
+  }
+
   .post.small > .body > .image > img {
     width: 100px;
   }
