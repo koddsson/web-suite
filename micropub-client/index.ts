@@ -1,6 +1,10 @@
-import opine, { urlencoded } from "https://deno.land/x/opine@0.21.2/mod.ts";
+import opine, {
+  urlencoded,
+  serveStatic,
+} from "https://deno.land/x/opine@0.21.2/mod.ts";
 import { renderFileToString } from "https://deno.land/x/dejs@0.8.0/mod.ts";
 import { DB } from "https://deno.land/x/sqlite/mod.ts";
+import { dirname, join } from "https://deno.land/std@0.73.0/path/mod.ts";
 import authentication from "./authentication.ts";
 import { getCookie } from "./utils.ts";
 import { Rel, getEndpointsFromUrl } from "./micropub.ts";
@@ -12,9 +16,11 @@ db.query(
 );
 
 const app = opine();
-app.engine(".html", renderFileToString);
 
+const __dirname = dirname(import.meta.url);
+app.use(serveStatic(join(__dirname, "public")));
 app.use(urlencoded());
+app.engine(".html", renderFileToString);
 
 app.get("/", async function (req, res) {
   const sessionId = getCookie(req.headers.get("Cookie") || "", "session");

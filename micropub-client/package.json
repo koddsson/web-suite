@@ -1,0 +1,22 @@
+{
+  "name": "@koddsson/micropub-client",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A micropub client",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build:css",
+    "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
+    "build:css:watch": "npm run build -- -- --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8.1.1",
+    "postcss-cli": "^8.1.0",
+    "postcss-import": "^12.0.1"
+  }
+}
