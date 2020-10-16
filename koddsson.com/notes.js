@@ -84,6 +84,7 @@ app.get('/feed.xml', async (req, res) => {
 })
 
 app.get('/:slug', async (req, res) => {
+  const slug = Number(req.params.slug)
   const legacyLinks = {
     '2018-08-25-0.html': 1535200649,
     '2018-08-23-0.html': 1535047453,
@@ -92,16 +93,16 @@ app.get('/:slug', async (req, res) => {
     '2018-08-21.html': 1534870136
   }
 
-  if (legacyLinks[req.params.slug]) {
-    return res.redirect(301, `/notes/${legacyLinks[req.params.slug]}`)
+  if (legacyLinks[slug]) {
+    return res.redirect(301, `/notes/${legacyLinks[slug]}`)
   }
 
-  const note = await db.get('SELECT * FROM notes WHERE slug = ?', req.params.slug)
+  const note = await db.get('SELECT * FROM notes WHERE slug = ?', slug)
   if (!note) {
     return res.status(404).send('Not found')
   }
   note.timestamp = relativeDate(note.timetamp * 1000)
-  const photo = await db.get('SELECT * FROM photos WHERE slug = ?', req.params.slug)
+  const photo = await db.get('SELECT * FROM photos WHERE slug = ?', slug)
   return res.render('note', {note, photo})
 })
 
