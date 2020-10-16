@@ -29,16 +29,12 @@ hbs.registerHelper('markdown', markdown({linkify: true}))
 
 app.get('/', async (req, res) => {
   // TODO: Somehow get favorites to show up in the latest notes agaitn
-  //SELECT url as content, slug, 'favorite' as type, slug as timestamp, NULL as reply from favorites
-  //  UNION ALL
-  // TODO: Do we need the array accessors here? Seems like this should just be a DB get request.
-  const latestNote = (
-    await db.all(`
+  // SELECT url as content, slug, 'favorite' as type, slug as timestamp, NULL as reply from favorites UNION ALL
+  const latestNote = await db.get(`
     SELECT content, slug, 'note' as type, timestamp, replyTo as reply FROM notes
     ORDER BY timestamp DESC
     LIMIT 1
   `)
-  )[0]
   latestNote.timestamp = relativeDate(latestNote.timestamp * 1000)
   latestNote.isNote = latestNote.type === 'note'
   latestNote.isFavorite = latestNote.type === 'favorite'
