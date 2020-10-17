@@ -34,7 +34,7 @@ app.get("/", async function (req, res) {
 });
 
 app.post("/post", async function (req, res) {
-  const { note } = req.parsedBody;
+  const { in_reply_to, note } = req.parsedBody;
   const sessionId = getCookie(req.headers.get("Cookie") || "", "session");
   const { token, me } = getToken(sessionId);
   if (token) {
@@ -50,6 +50,7 @@ app.post("/post", async function (req, res) {
     const body = JSON.stringify({
       h: "entry",
       content: note,
+      in_reply_to,
     });
 
     const response = await fetch(micropub_endpoint.href, {
