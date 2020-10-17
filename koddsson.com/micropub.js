@@ -54,7 +54,7 @@ app.post('/', async (req, res) => {
       req.body['location'],
       categories,
       timestamp,
-      req.body['in-reply-of']
+      req.body['in-reply-to']
     )
 
     const noteLink = `https://koddsson.com/notes/${id}`
