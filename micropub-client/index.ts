@@ -9,7 +9,7 @@ import authentication from "./authentication.ts";
 import { getCookie } from "./utils.ts";
 import { Rel, getEndpointsFromUrl } from "./micropub.ts";
 
-const PORT = Deno.env.get("PORT") || 3000;
+const PORT = Number(Deno.env.get("PORT")) || 3000;
 
 // Open a database
 const db = new DB("./client.db");
