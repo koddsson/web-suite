@@ -9,6 +9,8 @@ import authentication from "./authentication.ts";
 import { getCookie } from "./utils.ts";
 import { Rel, getEndpointsFromUrl } from "./micropub.ts";
 
+const PORT = Deno.env.get("PORT") || 3000;
+
 // Open a database
 const db = new DB("./client.db");
 db.query(
@@ -79,5 +81,5 @@ function getToken(sessionId: string): { token: string; me: string } {
 
 app.use("/auth", authentication);
 
-console.log("listening on port 3000");
-app.listen(3000);
+console.log(`Listening on port ${PORT}.`);
+app.listen(PORT);
