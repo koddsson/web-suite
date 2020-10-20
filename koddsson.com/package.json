@@ -7,7 +7,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run lint",
-    "start": "node -r dotenv/config index.js",
+    "start": "ts-node -r dotenv/config index.js",
     "lint": "eslint .",
     "build": "npm run build:css",
     "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
@@ -40,6 +40,8 @@
     "postcss": "^8.1.1",
     "postcss-cli": "^8.1.0",
     "postcss-import": "^12.0.1",
-    "prettier": "^2.1.2"
+    "prettier": "^2.1.2",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
   }
 }
