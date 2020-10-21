@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import express from 'express'
 import bodyParser from 'body-parser'
 
-import * as db from './database'
+import * as db from './database.js'
 
 const app = express()
 app.use(bodyParser.json())
@@ -21,7 +21,7 @@ app.post('/', async (req, res) => {
   const response = await fetch('https://tokens.indieauth.com/token', {
     headers: {
       Accept: 'application/json',
-      Authorization: req.header('Authorization')
+      Authorization: req.header('Authorization') || ''
     }
   })
 
@@ -38,13 +38,13 @@ app.post('/', async (req, res) => {
 
   if (req.body['like-of']) {
     // TODO: Try and get metadata and add to the table.
-    const timestamp = Math.floor(new Date() / 1000)
+    const timestamp = Math.floor(Number(new Date()) / 1000)
     await db.run("INSERT INTO favorites VALUES (?, DateTime('now'), ?)", req.body['like-of'], timestamp)
     // TODO: Set this header more correctly
     res.header('Location', 'https://koddsson.com/favorites')
     return res.status(201).send('Favorited')
   } else if (req.body['in-reply-to']) {
-    const timestamp = Math.floor(new Date() / 1000)
+    const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
     const note = req.body['content']
     await db.run(
@@ -63,7 +63,7 @@ app.post('/', async (req, res) => {
     res.header('Location', noteLink)
     return res.status(201).send('Note posted')
   } else if (req.body['h'] === 'entry') {
-    const timestamp = Math.floor(new Date() / 1000)
+    const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
     const note = req.body['content']
     await db.run(
@@ -82,7 +82,7 @@ app.post('/', async (req, res) => {
     res.header('Location', noteLink)
     return res.status(201).send('Note posted')
   } else if (req.body['type'] && req.body['type'].includes('h-entry')) {
-    const timestamp = Math.floor(new Date() / 1000)
+    const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
     const properties = req.body.properties
     const photo = properties.photo && properties.photo[0]
