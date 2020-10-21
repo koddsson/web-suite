@@ -1,1 +1,1 @@
-declare module 'helper-markdown';
+declare module 'helper-markdown'
