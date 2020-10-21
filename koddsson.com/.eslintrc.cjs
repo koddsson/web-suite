@@ -1,6 +1,7 @@
 module.exports = {
   root: true,
-  plugins: ['prettier'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['prettier', '@typescript-eslint'],
   rules: {
     'prettier/prettier': 'error'
   },
@@ -8,7 +9,7 @@ module.exports = {
     sourceType: 'module',
     ecmaVersion: 2020
   },
-  extends: ['eslint:recommended', 'prettier'],
+  extends: ['eslint:recommended', 'prettier', 'plugin:@typescript-eslint/recommended'],
   env: {
     node: true,
     es6: true

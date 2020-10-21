@@ -6,11 +6,11 @@ import hbs from 'hbs'
 import markdown from 'helper-markdown'
 import HTMLEntities from 'html-entities'
 import handlebars from 'handlebars'
-
-import * as db from './database.js'
-
 import {fileURLToPath} from 'url'
 import {dirname} from 'path'
+
+import * as db from './database.js'
+import type {Note} from './app.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -33,7 +33,7 @@ hbs.registerPartials(__dirname + '/views/partials')
 hbs.registerHelper('markdown', markdown({linkify: true}))
 
 app.get('/', async (req, res) => {
-  const notes = await db.all('SELECT * FROM notes ORDER BY timestamp DESC')
+  const notes = await db.all<Note>('SELECT * FROM notes ORDER BY timestamp DESC')
   const notesWithTimestamps = await Promise.all(
     notes.map(async note => {
       note.timestamp = relativeDate(note.timestamp * 1000)
@@ -45,19 +45,26 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/feed.xml', async (req, res) => {
-  const notes = await db.all('SELECT * FROM notes ORDER BY timestamp DESC')
+  const notes = await db.all<Note>('SELECT * FROM notes ORDER BY timestamp DESC')
   const items = []
   for (const note of notes) {
+    // TODO: There's got to be a better way to format these dates
     const date = new Date(note.timestamp * 1000)
-    let month = date.getMonth() + 1
+    let timestamp = `${date.getFullYear()}`
+
+    const month = date.getMonth() + 1
     if (month < 10) {
-      month = `0${month}`
+      timestamp = `${timestamp}-0${month}`
+    } else {
+      timestamp = `${timestamp}-${month}`
     }
-    let day = date.getDate()
+
+    const day = date.getDate()
     if (day < 10) {
-      day = `0${day}`
+      timestamp = `${timestamp}-0${day}`
+    } else {
+      timestamp = `${timestamp}-${day}`
     }
-    const timestamp = `${date.getFullYear()}-${month}-${day}`
     note.photo = await db.get('SELECT * FROM photos where slug = ?', note.slug)
     items.push(`
     <item>
@@ -85,7 +92,7 @@ app.get('/feed.xml', async (req, res) => {
 
 app.get('/:slug', async (req, res) => {
   const slug = Number(req.params.slug)
-  const legacyLinks = {
+  const legacyLinks: {[key: string]: number} = {
     '2018-08-25-0.html': 1535200649,
     '2018-08-23-0.html': 1535047453,
     '2018-08-22-1.html': 1534940871,
@@ -97,11 +104,11 @@ app.get('/:slug', async (req, res) => {
     return res.redirect(301, `/notes/${legacyLinks[slug]}`)
   }
 
-  const note = await db.get('SELECT * FROM notes WHERE slug = ?', slug)
+  const note = await db.get<Note>('SELECT * FROM notes WHERE slug = ?', slug)
   if (!note) {
     return res.status(404).send('Not found')
   }
-  note.timestamp = relativeDate(note.timetamp * 1000)
+  note.timestamp = relativeDate(note.timestamp * 1000)
   const photo = await db.get('SELECT * FROM photos WHERE slug = ?', slug)
   return res.render('note', {note, photo})
 })
