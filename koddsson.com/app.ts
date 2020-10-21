@@ -8,6 +8,7 @@ import {dirname} from 'path'
 import markdown from 'helper-markdown'
 
 import micropub from './micropub.js'
+import favorites from './favorites.js'
 import notes from './notes.js'
 import * as db from './database.js'
 
@@ -55,10 +56,6 @@ app.get('/', async (req, res) => {
 
 app.use('/micropub', micropub)
 app.use('/notes', notes)
-
-app.get('/favorites', async (req, res) => {
-  const favorites = await db.all('SELECT * FROM favorites ORDER BY timestamp DESC')
-  return res.render('favorites', {favorites})
-})
+app.get('/favorites', favorites)
 
 export default app
