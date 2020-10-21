@@ -6,6 +6,7 @@ import hbs from 'hbs'
 import {fileURLToPath} from 'url'
 import {dirname} from 'path'
 import markdown from 'helper-markdown'
+import type {Note} from '../types'
 
 import micropub from './micropub.js'
 import favorites from './favorites.js'
@@ -26,15 +27,6 @@ app.set('view engine', 'hbs')
 
 hbs.registerPartials(__dirname + '/views/partials')
 hbs.registerHelper('markdown', markdown({linkify: true}))
-
-export interface Note {
-  slug: string
-  timestamp: number
-  isNote: boolean
-  isFavorite: boolean
-  photo: string
-  type: 'note' | 'favorite'
-}
 
 app.get('/', async (req, res) => {
   // TODO: Somehow get favorites to show up in the latest notes agaitn

@@ -10,7 +10,7 @@ import {fileURLToPath} from 'url'
 import {dirname} from 'path'
 
 import * as db from './database.js'
-import type {Note} from './app.js'
+import type {Note} from '../types'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
