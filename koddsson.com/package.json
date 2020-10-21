@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "type": "module",
   "scripts": {
     "test": "npm run lint",
-    "start": "ts-node -r dotenv/config index.ts",
+    "start": "node --loader ts-node/esm.mjs --experimental-top-level-await -r dotenv/config index.ts",
     "lint": "eslint .",
     "build": "npm run build:css",
     "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
