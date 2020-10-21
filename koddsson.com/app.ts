@@ -5,9 +5,9 @@ import relativeDate from 'relative-date'
 import hbs from 'hbs'
 import markdown from 'helper-markdown'
 
-import micropub from './micropub.js'
-import notes from './notes.js'
-import * as db from './database.js'
+import micropub from './micropub'
+import notes from './notes'
+import * as db from './database'
 
 import {fileURLToPath} from 'url'
 import {dirname} from 'path'

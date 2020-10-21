@@ -7,7 +7,7 @@ import markdown from 'helper-markdown'
 import HTMLEntities from 'html-entities'
 import handlebars from 'handlebars'
 
-import * as db from './database.js'
+import * as db from './database'
 
 import {fileURLToPath} from 'url'
 import {dirname} from 'path'

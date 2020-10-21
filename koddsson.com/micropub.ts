@@ -2,7 +2,7 @@ import fetch from 'node-fetch'
 import express from 'express'
 import bodyParser from 'body-parser'
 
-import * as db from './database.js'
+import * as db from './database'
 
 const app = express()
 app.use(bodyParser.json())

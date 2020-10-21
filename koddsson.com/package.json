@@ -2,12 +2,11 @@
   "name": "koddsson.com",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "npm run lint",
-    "start": "ts-node -r dotenv/config index.js",
+    "start": "ts-node -r dotenv/config index.ts",
     "lint": "eslint .",
     "build": "npm run build:css",
     "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
@@ -33,6 +32,7 @@
   },
   "devDependencies": {
     "@github/prettier-config": "0.0.4",
+    "@types/node": "^14.14.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^7.9.0",
     "eslint-config-prettier": "^6.11.0",
