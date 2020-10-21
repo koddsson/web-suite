@@ -11,12 +11,12 @@ export async function all<T>(statement: string, ...args: unknown[]): Promise<T[]
   return results
 }
 
-export async function get<T>(statement: string, ...args: unknown[]): Promise<T> {
+export async function get<T>(statement: string, ...args: unknown[]): Promise<T | undefined> {
   const db = await open({
     filename: process.env.DB_HOST || '',
     driver: sqlite3.Database
   })
-  const results = await db.get(statement, ...args)
+  const results: T | undefined = await db.get(statement, ...args)
   db.close()
   return results
 }

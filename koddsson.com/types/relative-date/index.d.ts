@@ -1,1 +1,4 @@
-declare module 'relative-date'
+declare module 'relative-date' {
+  function relativeDate(arg: number): string
+  export = relativeDate
+}

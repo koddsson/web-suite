@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import express from 'express'
+import express, {Request} from 'express'
 import bodyParser from 'body-parser'
 
 import * as db from './database.js'
@@ -16,7 +16,26 @@ app.get('/', async (req, res) => {
   return res.status(404).send('Not found')
 })
 
-app.post('/', async (req, res) => {
+interface AuthResponse {
+  me: string
+}
+
+interface NotePayload {
+  category: string[]
+  'mp-slug': string
+  'like-of': string
+  location: string
+  h: 'entry'
+  properties: {
+    photo: {value: string; alt: string}[]
+    content: string[]
+  }
+  type: string
+  content: string
+  'in-reply-to': string
+}
+
+app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   // Handle authorization
   const response = await fetch('https://tokens.indieauth.com/token', {
     headers: {
@@ -25,12 +44,12 @@ app.post('/', async (req, res) => {
     }
   })
 
-  const json = await response.json()
+  const json: AuthResponse = await response.json()
   if (json.me !== 'https://koddsson.com/') {
     return res.status(401).send('Unauthorized')
   }
 
-  const categories = (req.body['category'] || []).join(',')
+  const categories = (req.body.category || []).join(',')
   const slug = req.body['mp-slug']
 
   // Don't remove this. It's good to know what requests look like in the logs
@@ -46,12 +65,12 @@ app.post('/', async (req, res) => {
   } else if (req.body['in-reply-to']) {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
-    const note = req.body['content']
+    const note = req.body.content
     await db.run(
       'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
       id,
       note,
-      req.body['location'],
+      req.body.location,
       categories,
       timestamp,
       req.body['in-reply-to']
@@ -62,15 +81,15 @@ app.post('/', async (req, res) => {
     // TODO: Set this header more correctly
     res.header('Location', noteLink)
     return res.status(201).send('Note posted')
-  } else if (req.body['h'] === 'entry') {
+  } else if (req.body.h === 'entry') {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
-    const note = req.body['content']
+    const note = req.body.content
     await db.run(
       'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
       id,
       note,
-      req.body['location'],
+      req.body.location,
       categories,
       timestamp,
       null
@@ -81,7 +100,7 @@ app.post('/', async (req, res) => {
     // TODO: Set this header more correctly
     res.header('Location', noteLink)
     return res.status(201).send('Note posted')
-  } else if (req.body['type'] && req.body['type'].includes('h-entry')) {
+  } else if (req.body.type && req.body.type.includes('h-entry')) {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
     const properties = req.body.properties

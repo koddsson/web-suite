@@ -36,7 +36,7 @@ app.get('/', async (req, res) => {
   const notes = await db.all<Note>('SELECT * FROM notes ORDER BY timestamp DESC')
   const notesWithTimestamps = await Promise.all(
     notes.map(async note => {
-      note.timestamp = relativeDate(note.timestamp * 1000)
+      note.relativeDate = relativeDate(note.timestamp * 1000)
       note.photo = await db.get('SELECT * FROM photos where slug = ?', note.slug)
       return note
     })
@@ -108,7 +108,7 @@ app.get('/:slug', async (req, res) => {
   if (!note) {
     return res.status(404).send('Not found')
   }
-  note.timestamp = relativeDate(note.timestamp * 1000)
+  note.relativeDate = relativeDate(note.timestamp * 1000)
   const photo = await db.get('SELECT * FROM photos WHERE slug = ?', slug)
   return res.render('note', {note, photo})
 })

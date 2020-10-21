@@ -36,12 +36,13 @@ app.get('/', async (req, res) => {
     ORDER BY timestamp DESC
     LIMIT 1
   `)
-  latestNote.timestamp = relativeDate(latestNote.timestamp * 1000)
-  latestNote.isNote = latestNote.type === 'note'
-  latestNote.isFavorite = latestNote.type === 'favorite'
-  /* istanbul ignore else */
-  if (latestNote.isNote) {
-    latestNote.photo = await db.get('SELECT * FROM photos where slug = ?', latestNote.slug)
+  if (latestNote) {
+    latestNote.relativeDate = relativeDate(latestNote.timestamp * 1000)
+    latestNote.isNote = latestNote.type === 'note'
+    latestNote.isFavorite = latestNote.type === 'favorite'
+    if (latestNote.isNote) {
+      latestNote.photo = await db.get('SELECT * FROM photos where slug = ?', latestNote.slug)
+    }
   }
   return res.render('index', {latestNote})
 })
