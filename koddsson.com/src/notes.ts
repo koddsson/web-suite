@@ -29,7 +29,8 @@ app.use(bodyParser.json())
 
 app.set('view engine', 'hbs')
 
-hbs.registerPartials(__dirname + '/views/partials')
+app.set('views', __dirname + '/views')
+hbs.registerPartials(__dirname + '/src/views/partials')
 hbs.registerHelper('markdown', markdown({linkify: true}))
 
 app.get('/', async (req, res) => {
