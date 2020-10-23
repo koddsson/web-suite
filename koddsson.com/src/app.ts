@@ -24,6 +24,7 @@ app.use(bodyParser.urlencoded({extended: true, limit: '100mb'}))
 app.use(bodyParser.json())
 
 app.set('view engine', 'hbs')
+app.set('views', __dirname + '/views')
 
 hbs.registerPartials(__dirname + '/views/partials')
 hbs.registerHelper('markdown', markdown({linkify: true}))

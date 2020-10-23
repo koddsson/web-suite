@@ -2,13 +2,13 @@
   "name": "koddsson.com",
   "private": true,
   "version": "1.0.0",
-  "description": "",
+  "description": "My personal website",
   "main": "index.ts",
   "type": "module",
   "scripts": {
     "test": "npm run lint",
-    "start": "node --loader ts-node/esm.mjs -r dotenv/config index.ts",
-    "lint": "eslint .",
+    "start": "node --loader ts-node/esm.mjs -r dotenv/config src/index.ts",
+    "lint": "eslint src/",
     "build": "npm run build:css",
     "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
     "build:css:watch": "npm run build -- -- --watch"
