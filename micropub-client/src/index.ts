@@ -20,7 +20,7 @@ db.query(
 const app = opine();
 
 const __dirname = dirname(import.meta.url);
-app.use(serveStatic(join(__dirname, "public")));
+app.use(serveStatic(join(__dirname, "../public")));
 app.use(urlencoded());
 app.engine(".html", renderFileToString);
 

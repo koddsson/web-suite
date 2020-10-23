@@ -5,6 +5,7 @@
   "description": "A micropub client",
   "main": "index.ts",
   "scripts": {
+    "start": "deno run --allow-read --allow-write --allow-net --allow-env src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build:css",
     "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
