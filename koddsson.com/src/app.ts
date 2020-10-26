@@ -6,7 +6,7 @@ import hbs from 'hbs'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import markdown from 'helper-markdown'
-import type {Note} from './types'
+import type { Note, Photo } from './types'
 
 import micropub from './micropub.js'
 import favorites from './favorites.js'
@@ -46,14 +46,14 @@ async function getLatestPost() {
   `)
   if (latestNote) {
     latestNote.relativeDate = relativeDate(latestNote.timestamp * 1000)
-    latestNote.isNote = latestNote.type === 'note'
-    latestNote.isFavorite = latestNote.type === 'favorite'
-    if (latestNote.isNote) {
-      latestNote.photo = await db.get('SELECT * FROM photos where slug = ?', latestNote.slug)
-    }
+    latestNote.isNote = true
+    latestNote.isFavorite = false
+    latestNote.photo = await getPhoto(latestNote.slug)
   }
-  return res.render('index', {latestNote})
-})
+  return latestNote
+}
+
+app.get('/', async (_, res) => res.render('index', { latestNote: await getLatestPost() }))
 
 app.use('/micropub', micropub)
 app.use('/notes', notes)
