@@ -24,7 +24,7 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: true, limit: '100mb'}))
 app.use(bodyParser.json())
 
-// Setting up ciiews and partials.
+// Setting up views and partials.
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
 hbs.registerPartials(__dirname + '/views/partials')
