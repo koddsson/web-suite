@@ -28,3 +28,7 @@ export async function getLatestPost() {
   // SELECT url as content, slug, 'favorite' as type, slug as timestamp, NULL as reply from favorites UNION ALL
   return latestNote
 }
+
+export async function getFavorites() {
+  return await all('SELECT * FROM favorites ORDER BY timestamp DESC')
+}

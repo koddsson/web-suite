@@ -1,11 +1,19 @@
 import express from 'express'
-import * as db from './database.js'
+import hbs from 'hbs'
+import {fileURLToPath} from 'url'
+import {dirname} from 'path'
+
+import {getFavorites} from './data.js'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const app = express()
 
-app.get('/', async (req, res) => {
-  const favorites = await db.all('SELECT * FROM favorites ORDER BY timestamp DESC')
-  return res.render('favorites', {favorites})
-})
+app.set('view engine', 'hbs')
+
+app.set('views', __dirname + '/views')
+hbs.registerPartials(__dirname + '/src/views/partials')
+
+app.get('/', async (_, res) => res.render('favorites', {favorites: await getFavorites()}))
 
 export default app
