@@ -12,8 +12,7 @@ import {dirname} from 'path'
 import * as db from './database.js'
 import type {Note} from './types'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const entities = new HTMLEntities.XmlEntities()
 
