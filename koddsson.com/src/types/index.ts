@@ -8,7 +8,7 @@ export interface Note {
   type: 'note' | 'favorite'
 }
 
-interface Photo {
+export interface Photo {
   url: string
   alt: string
 }
