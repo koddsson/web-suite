@@ -1,6 +1,7 @@
 import fs from 'fs'
 import express from 'express'
 import bodyParser from 'body-parser'
+import relativeDate from 'relative-date'
 import hbs from 'hbs'
 import markdown from 'helper-markdown'
 import HTMLEntities from 'html-entities'
@@ -9,7 +10,6 @@ import {fileURLToPath} from 'url'
 import {dirname} from 'path'
 
 import * as db from './database.js'
-import {relativeDate} from './utils/date.js'
 import type {Note} from './types'
 
 const __filename = fileURLToPath(import.meta.url)

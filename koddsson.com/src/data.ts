@@ -1,6 +1,7 @@
+import relativeDate from 'relative-date'
+
 import type {Note, Photo} from './types'
 import {get} from './database.js'
-import {relativeDate} from './utils/date.js'
 
 async function getPhoto(slug: string): Promise<Photo> {
   return (await get<Photo>('SELECT * FROM photos where slug = ?', slug))!
