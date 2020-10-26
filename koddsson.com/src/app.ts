@@ -49,6 +49,6 @@ app.get('/', async (req, res) => {
 
 app.use('/micropub', micropub)
 app.use('/notes', notes)
-app.get('/favorites', favorites)
+app.use('/favorites', favorites)
 
 export default app
