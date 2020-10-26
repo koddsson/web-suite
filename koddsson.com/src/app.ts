@@ -3,8 +3,8 @@ import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import relativeDate from 'relative-date'
 import hbs from 'hbs'
-import {fileURLToPath} from 'url'
-import {dirname} from 'path'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 import markdown from 'helper-markdown'
 import type {Note} from './types'
 
@@ -19,17 +19,25 @@ const app = express()
 
 app.use(morgan('combined'))
 app.use(express.static('public'))
-app.use(bodyParser.urlencoded({extended: true, limit: '100mb'}))
+
+// Not sure if this needed here or in sub-apps.
+app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }))
 app.use(bodyParser.json())
 
+// Setting up ciiews and partials.
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
-
 hbs.registerPartials(__dirname + '/views/partials')
-hbs.registerHelper('markdown', markdown({linkify: true}))
 
-app.get('/', async (req, res) => {
-  // TODO: Somehow get favorites to show up in the latest notes agaitn
+// Set up markdown helper in handlebar views.
+hbs.registerHelper('markdown', markdown({ linkify: true }))
+
+async function getPhoto(slug: string): Promise<Photo> {
+  return (await db.get<Photo>('SELECT * FROM photos where slug = ?', slug))!
+}
+
+async function getLatestPost() {
+  // TODO: Somehow get favorites to show up in the latest notes again
   // SELECT url as content, slug, 'favorite' as type, slug as timestamp, NULL as reply from favorites UNION ALL
   const latestNote = await db.get<Note>(`
     SELECT content, slug, 'note' as type, timestamp, replyTo as reply FROM notes
