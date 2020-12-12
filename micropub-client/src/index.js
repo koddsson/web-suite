@@ -1,36 +1,42 @@
-import opine, {
-  urlencoded,
-  serveStatic,
-} from "https://deno.land/x/opine@0.21.2/mod.ts";
-import { renderFileToString } from "https://deno.land/x/dejs@0.8.0/mod.ts";
-import { DB } from "https://deno.land/x/sqlite/mod.ts";
-import { dirname, join } from "https://deno.land/std@0.73.0/path/mod.ts";
-import authentication from "./authentication.ts";
-import { getCookie } from "./utils.ts";
-import { Rel, getEndpointsFromUrl } from "./micropub.ts";
+//import opine, {
+//  urlencoded,
+//  serveStatic,
+//} from "https://deno.land/x/opine@0.21.2/mod.ts";
+import express from "express";
+import sqlite3 from "sqlite3";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
-const PORT = Number(Deno.env.get("PORT")) || 3000;
+import authentication from "./authentication.js";
+import { getCookie } from "./utils.js";
+import { getEndpointsFromUrl } from "./micropub.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const PORT = Number(process.env["PORT"]) || 3000;
+
+const render = (res, filename) =>
+  res.sendFile(filename, { root: join(__dirname, "../views") });
 
 // Open a database
-const db = new DB("./client.db");
-db.query(
+const db = new sqlite3.Database("./client.db");
+db.run(
   "CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY_KEY, token TEXT, me TEXT)"
 );
 
-const app = opine();
+const app = express();
 
-const __dirname = dirname(import.meta.url);
-app.use(serveStatic(join(__dirname, "../public")));
-app.use(urlencoded());
-app.engine(".html", renderFileToString);
+app.use(express.static("../public"));
+app.use(express.urlencoded());
+app.set("view engine", "ejs");
 
 app.get("/", async function (req, res) {
-  const sessionId = getCookie(req.headers.get("Cookie") || "", "session");
+  const sessionId = getCookie(req.headers["Cookie"] || "", "session");
   const { token } = getToken(sessionId);
   if (token) {
-    return res.render("index.html");
+    return render(res, "index.html");
   }
-  return res.render("login.html");
+  return render(res, "login.html");
 });
 
 app.post("/post", async function (req, res) {
@@ -40,7 +46,7 @@ app.post("/post", async function (req, res) {
   if (token) {
     const endpoints = await getEndpointsFromUrl(me);
     const micropub_endpoint = endpoints.find(
-      (endpoint: Rel) => endpoint.rel === "micropub"
+      (endpoint) => endpoint.rel === "micropub"
     );
 
     if (!micropub_endpoint) {
@@ -64,15 +70,13 @@ app.post("/post", async function (req, res) {
     const location = response.headers.get("Location");
     return res.redirect(location || "/");
   }
-  return res.render("404.html");
+  return render(res, "404.html");
 });
 
-function getToken(sessionId: string): { token: string; me: string } {
-  const results = [
-    ...db
-      .query("SELECT token, me FROM sessions WHERE id = ?", [sessionId])
-      .asObjects(),
-  ][0];
+function getToken(sessionId) {
+  const results = db.get("SELECT token, me FROM sessions WHERE id = ?", [
+    sessionId,
+  ]);
   if (results) {
     const { token, me } = results;
     return { token, me };

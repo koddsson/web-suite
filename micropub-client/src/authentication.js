@@ -1,43 +1,43 @@
-import opine from "https://deno.land/x/opine@0.21.2/mod.ts";
-import { createHash } from "https://deno.land/std/hash/mod.ts";
-import { DB } from "https://deno.land/x/sqlite/mod.ts";
+import express from "express";
+import sqlite3 from "sqlite3";
+import crypto from "crypto";
 
-import { createCookie } from "./utils.ts";
-import { Rel, getEndpointsFromUrl, getToken } from "./micropub.ts";
+import { createCookie } from "./utils.js";
+import { getEndpointsFromUrl, getToken } from "./micropub.js";
 
-const clientId = Deno.env.get("CLIENT_ID") || "http://localhost:3000";
+const clientId = process.env["CLIENT_ID"] || "http://localhost:3000";
 const redirectUri =
-  Deno.env.get("REDIRECT_URI") || "http://localhost:3000/auth/success";
+  process.env["REDIRECT_URI"] || "http://localhost:3000/auth/success";
 
 // Open a database
-const db = new DB("./client.db");
-db.query(
+const db = new sqlite3.Database("./client.db");
+db.run(
   "CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY_KEY, token TEXT, me TEXT)"
 );
 
-const app = opine();
+const app = express();
 
 app.post("/", async function (req, res) {
   const { me } = req.parsedBody;
   const endpoints = await getEndpointsFromUrl(me);
 
   const authorization_endpoint = endpoints.find(
-    (endpoint: Rel) => endpoint.rel === "authorization_endpoint"
+    (endpoint) => endpoint.rel === "authorization_endpoint"
   );
 
   if (!authorization_endpoint) {
     throw new Error("Couldn't find authorization endpoint.");
   }
 
-  const hash = createHash("sha256");
+  const hash = crypto.createHash("md5");
   hash.update(clientId);
   hash.update(redirectUri);
   const state = hash.toString();
 
   const params = new URLSearchParams({
     me,
-    client_id: clientId!,
-    redirect_uri: redirectUri!,
+    client_id: clientId,
+    redirect_uri: redirectUri,
     response_type: "code",
     state,
   });
@@ -60,7 +60,7 @@ app.get("/success", async function (req, res) {
 
   const endpoints = await getEndpointsFromUrl(me);
   const token_endpoint = endpoints.find(
-    (endpoint: Rel) => endpoint.rel === "token_endpoint"
+    (endpoint) => endpoint.rel === "token_endpoint"
   );
   if (!token_endpoint) {
     throw new Error("Couldn't find token endpoint.");
@@ -80,7 +80,7 @@ app.get("/success", async function (req, res) {
 
   const id = hash.toString();
 
-  db.query("INSERT INTO sessions VALUES(?, ?, ?)", [id, token, me]);
+  db.run("INSERT INTO sessions VALUES(?, ?, ?)", [id, token, me]);
 
   res.set("Set-Cookie", createCookie("session", id, req.secure));
   res.redirect("/");
