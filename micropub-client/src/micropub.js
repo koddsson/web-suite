@@ -1,21 +1,12 @@
 // TODO: Fix all these imports
-import { parseDOM } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/htmlparser2/index.ts";
-import { findAll } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domutils/querying.ts";
-import type { Element } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domhandler/index.ts";
+//import { findAll } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domutils/querying.ts";
+//import type { Element } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domhandler/index.ts";
 
-export async function getToken({
-  me,
-  clientId,
-  redirectUri,
-  url,
-  code,
-}: {
-  me: string;
-  clientId: string;
-  redirectUri: string;
-  url: string;
-  code: string;
-}) {
+import fetch from "node-fetch";
+import pkg from "node-html-parser";
+const { parse } = pkg;
+
+export async function getToken({ me, clientId, redirectUri, url, code }) {
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     me,
@@ -33,7 +24,7 @@ export async function getToken({
     },
   });
 
-  let results: { [key: string]: string } = {};
+  let results = {};
 
   if (res.headers.get("Content-Type") === "application/x-www-form-urlencoded") {
     const entries = new URLSearchParams(await res.text()).entries();
@@ -63,12 +54,7 @@ export async function getToken({
   return results.access_token;
 }
 
-export interface Rel {
-  rel: string;
-  href: string;
-}
-
-export async function getEndpointsFromUrl(url: string): Promise<Rel[]> {
+export async function getEndpointsFromUrl(url) {
   // Fetch the given url
   const res = await fetch(url, {
     method: "GET",
@@ -77,11 +63,13 @@ export async function getEndpointsFromUrl(url: string): Promise<Rel[]> {
     },
   });
 
-  const html = parseDOM(await res.text());
-  const rels = Array.from(
-    findAll((element: Element) => element.tagName === "link", html)
-  ).map((element: Element) => {
-    const { rel, href } = element.attribs;
+  const responseText = await res.text();
+
+  const html = parse(responseText);
+  const rels = Array.from(html.querySelectorAll("link")).map((element) => {
+    const rel = element.getAttribute("rel");
+    const href = element.getAttribute("href");
+
     return { rel, href };
   });
 
