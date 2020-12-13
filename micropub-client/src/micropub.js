@@ -1,7 +1,10 @@
 // TODO: Fix all these imports
-//import { parseDOM } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/htmlparser2/index.ts";
 //import { findAll } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domutils/querying.ts";
 //import type { Element } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domhandler/index.ts";
+
+import fetch from "node-fetch";
+import pkg from "node-html-parser";
+const { parse } = pkg;
 
 export async function getToken({ me, clientId, redirectUri, url, code }) {
   const body = new URLSearchParams({
@@ -60,11 +63,13 @@ export async function getEndpointsFromUrl(url) {
     },
   });
 
-  const html = parseDOM(await res.text());
-  const rels = Array.from(
-    findAll((element) => element.tagName === "link", html)
-  ).map((element) => {
-    const { rel, href } = element.attribs;
+  const responseText = await res.text();
+
+  const html = parse(responseText);
+  const rels = Array.from(html.querySelectorAll("link")).map((element) => {
+    const rel = element.getAttribute("rel");
+    const href = element.getAttribute("href");
+
     return { rel, href };
   });
 

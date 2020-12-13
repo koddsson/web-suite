@@ -1,11 +1,8 @@
-//import opine, {
-//  urlencoded,
-//  serveStatic,
-//} from "https://deno.land/x/opine@0.21.2/mod.ts";
 import express from "express";
 import sqlite3 from "sqlite3";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import fetch from "node-fetch";
 
 import authentication from "./authentication.js";
 import { getCookie } from "./utils.js";
@@ -27,12 +24,12 @@ db.run(
 const app = express();
 
 app.use(express.static("../public"));
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 app.get("/", async function (req, res) {
-  const sessionId = getCookie(req.headers["Cookie"] || "", "session");
-  const { token } = getToken(sessionId);
+  const sessionId = getCookie(req.headers.cookie || "", "session");
+  const { token } = await getToken(sessionId);
   if (token) {
     return render(res, "index.html");
   }
@@ -40,9 +37,9 @@ app.get("/", async function (req, res) {
 });
 
 app.post("/post", async function (req, res) {
-  const { in_reply_to, note } = req.parsedBody;
-  const sessionId = getCookie(req.headers.get("Cookie") || "", "session");
-  const { token, me } = getToken(sessionId);
+  const { in_reply_to, note } = req.body;
+  const sessionId = getCookie(req.headers.cookie || "", "session");
+  const { token, me } = await getToken(sessionId);
   if (token) {
     const endpoints = await getEndpointsFromUrl(me);
     const micropub_endpoint = endpoints.find(
@@ -73,8 +70,20 @@ app.post("/post", async function (req, res) {
   return render(res, "404.html");
 });
 
-function getToken(sessionId) {
-  const results = db.get("SELECT token, me FROM sessions WHERE id = ?", [
+async function dbGet(statement, variables) {
+  return new Promise((resolve, reject) => {
+    db.get(statement, variables, (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
+async function getToken(sessionId) {
+  const results = await dbGet("SELECT token, me FROM sessions WHERE id = ?", [
     sessionId,
   ]);
   if (results) {

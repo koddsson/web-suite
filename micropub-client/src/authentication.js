@@ -18,7 +18,7 @@ db.run(
 const app = express();
 
 app.post("/", async function (req, res) {
-  const { me } = req.parsedBody;
+  const { me } = req.body;
   const endpoints = await getEndpointsFromUrl(me);
 
   const authorization_endpoint = endpoints.find(
@@ -51,7 +51,7 @@ app.post("/", async function (req, res) {
 app.get("/success", async function (req, res) {
   const { code, me, state } = req.query;
 
-  const compareState = createHash("sha256");
+  const compareState = crypto.createHash("sha256");
   compareState.update(clientId);
   compareState.update(redirectUri);
   if (state !== compareState.toString()) {
@@ -74,11 +74,11 @@ app.get("/success", async function (req, res) {
     code,
   });
 
-  const hash = createHash("sha256");
+  const hash = crypto.createHash("sha256");
   hash.update(code);
   hash.update(me);
 
-  const id = hash.toString();
+  const id = hash.digest("hex");
 
   db.run("INSERT INTO sessions VALUES(?, ?, ?)", [id, token, me]);
 
