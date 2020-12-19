@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "A micropub client",
-  "main": "index.ts",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
