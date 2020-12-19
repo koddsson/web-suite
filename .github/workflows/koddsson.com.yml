@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'koddsson.com/**'
+      - '.github/workflows/koddsson.com.yml'
 
 defaults:
   run:
