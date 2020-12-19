@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'micropub-client/**'
+      - '.github/workflows/micropub-client.yml'
 
 defaults:
   run:
@@ -13,6 +14,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
     - name: SSH Remote Commands
       uses: appleboy/ssh-action@v0.1.3
@@ -22,3 +25,9 @@ jobs:
         key: ${{ secrets.KEY }}
         # TODO: I hate leaking ops stuff here but I'll have to figure it out later.
         script: ./scripts/update.sh koddsson/micropub-client
+    - uses: act10ns/slack@v1
+      with:
+        status: ${{ job.status }}
+        steps: ${{ toJson(steps) }}
+        channel: '#github'
+      if: always()
