@@ -1,9 +1,6 @@
-// TODO: Fix all these imports
-//import { findAll } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domutils/querying.ts";
-//import type { Element } from "https://raw.githubusercontent.com/koddsson/deno-htmlparser2/master/domhandler/index.ts";
-
 import fetch from "node-fetch";
 import pkg from "node-html-parser";
+
 const { parse } = pkg;
 
 export async function getToken({ me, clientId, redirectUri, url, code }) {

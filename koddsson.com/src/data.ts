@@ -4,6 +4,7 @@ import type {Note, Photo} from './types'
 import {all, get} from './database.js'
 
 async function getPhoto(slug: string): Promise<Photo> {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return (await get<Photo>('SELECT * FROM photos where slug = ?', slug))!
 }
 
@@ -22,13 +23,13 @@ async function getLatestNote() {
   return latestNote
 }
 
-export async function getLatestPost() {
+export async function getLatestPost(): Promise<Note | undefined> {
   const latestNote = await getLatestNote()
   // TODO: Somehow get favorites to show up in the latest notes again
   // SELECT url as content, slug, 'favorite' as type, slug as timestamp, NULL as reply from favorites UNION ALL
   return latestNote
 }
 
-export async function getFavorites() {
+export async function getFavorites(): Promise<unknown[]> {
   return await all('SELECT * FROM favorites ORDER BY timestamp DESC')
 }
