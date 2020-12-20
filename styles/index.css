@@ -1,23 +1,31 @@
 html, body {
-  font-size: 14px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  color: #333333;
+  line-height: 1.5;
 }
+
 .container {
   margin: auto;
   max-width: 320px;
 }
+
 .d-block {
   display: block;
 }
+
 .mb-1 {
   margin-bottom: 0.5em;
 }
+
 .mb-2 {
   margin-bottom: 1em;
 }
+
 .full-width {
   width: 100%;
 }
+
 button {
   background: white;
   border: 1px solid gray;
@@ -31,4 +39,66 @@ button.primary {
 
 label {
   font-weight:700;
+}
+
+article,
+.main {
+  max-width: 860px;
+  margin: auto;
+}
+
+img {
+  margin: 2em auto;
+  max-width: 100%;
+  display: block;
+}
+
+pre, code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27,31,35,0.05);
+  border-radius: 3px;
+  font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+
+pre {
+  padding: 10px;
+}
+
+header {
+  display: flex;
+}
+
+header > h1 {
+  flex: 1;
+}
+
+header > time {
+  align-self: center;
+}
+
+.flash {
+  position: relative;
+  padding: 16px;
+  color: #032f62;
+  background-color: #dbedff;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 3px;
+}
+
+.flash-warn {
+  color: #735c0f;
+  background-color: #fffbdd;
+  border-color: rgba(27, 31, 35, 0.15);
+}
+
+/* Utilites */
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1ch;
 }
