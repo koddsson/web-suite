@@ -1,5 +1,4 @@
 @import '../styles/index.css';
-@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap');
 
 :root {
   --background-color: #ffffff;
@@ -40,14 +39,6 @@ html, body {
   background-color: var(--background-color);
   color: var(--text-color);
   min-width: 320px;
-}
-
-body {
-  font-family: 'Fira Sans', sans-serif;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -moz-font-feature-settings: "liga" on;
 }
 
 .content {
