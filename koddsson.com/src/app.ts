@@ -9,6 +9,8 @@ import markdown from 'helper-markdown'
 import micropub from './micropub.js'
 import favorites from './favorites.js'
 import notes from './notes.js'
+import posts from './posts.js'
+
 import {getLatestPost} from './data.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -35,5 +37,6 @@ app.get('/', async (_, res) => res.render('index', {latestNote: await getLatestP
 app.use('/micropub', micropub)
 app.use('/notes', notes)
 app.use('/favorites', favorites)
+app.use('/posts', posts)
 
 export default app
