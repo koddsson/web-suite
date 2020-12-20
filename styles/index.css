@@ -68,14 +68,18 @@ pre {
 
 header {
   display: flex;
+  border-bottom: 1px solid lightgray;
 }
 
 header > h1 {
   flex: 1;
+  margin-bottom: 0;
 }
 
 header > time {
-  align-self: center;
+  font-size: 20px;
+  align-self: flex-end;
+  margin-bottom: 6px;
 }
 
 .flash {
