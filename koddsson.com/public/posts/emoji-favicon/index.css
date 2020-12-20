@@ -1,5 +1,5 @@
 body {
-  font-family: Montserrat;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
   color: #333333;
   line-height: 1.5;
 }
@@ -22,7 +22,7 @@ pre, code {
   font-size: 85%;
   background-color: rgba(27,31,35,0.05);
   border-radius: 3px;
-  font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;
+  font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 }
 
 pre {
@@ -70,8 +70,6 @@ header > time {
   justify-content: center;
   gap: 1ch;
 }
-
-
 
 /* Twitter embed fallback */
 blockquote.twitter-tweet {
