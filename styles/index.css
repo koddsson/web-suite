@@ -51,7 +51,7 @@ article,
 .main {
   max-width: 860px;
   margin: auto;
-  padding: 0 1em;
+  padding: 0 1em 1em;
 }
 
 img {
