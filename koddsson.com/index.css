@@ -45,10 +45,6 @@ html, body {
   width: 100%;
 }
 
-.name {
-  text-align: center;
-}
-
 a {
   color: var(--text-color);
   text-decoration: underline;
