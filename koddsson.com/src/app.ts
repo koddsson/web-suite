@@ -4,7 +4,7 @@ import bodyParser from 'body-parser'
 import hbs from 'hbs'
 import {fileURLToPath} from 'url'
 import {dirname} from 'path'
-import markdown from 'helper-markdown'
+import markdown from '@koddsson/helper-markdown'
 
 import micropub from './micropub.js'
 import favorites from './favorites.js'
