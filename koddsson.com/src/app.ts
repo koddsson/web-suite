@@ -11,8 +11,6 @@ import favorites from './favorites.js'
 import notes from './notes.js'
 import posts from './posts.js'
 
-import {getLatestPost} from './data.js'
-
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const app = express()
@@ -31,8 +29,6 @@ hbs.registerPartials(__dirname + '/views/partials')
 
 // Set up markdown helper in handlebar views.
 hbs.registerHelper('markdown', markdown({linkify: true}))
-
-app.get('/', async (_, res) => res.render('index', {latestNote: await getLatestPost()}))
 
 app.use('/micropub', micropub)
 app.use('/notes', notes)

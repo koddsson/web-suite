@@ -9,9 +9,10 @@
     "test": "npm run lint",
     "start": "node --loader ts-node/esm.mjs -r dotenv/config src/index.ts",
     "lint": "eslint src/",
-    "build": "npm run build:css",
+    "build": "npm run build:html && npm run build:css",
     "build:css": "postcss --use autoprefixer --use postcss-import -o public/css/index.css index.css",
-    "build:css:watch": "npm run build -- -- --watch"
+    "build:css:watch": "npm run build -- -- --watch",
+    "build:html": "hbs ./src/views/index.hbs --partial './data/notes/*.html' --partial './src/views/partials/*.hbs' --output public/"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "express": "^4.17.1",
     "handlebars": "^4.7.6",
     "hbs": "^4.1.1",
+    "hbs-cli": "^1.4.0",
     "html-entities": "^1.3.1",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
