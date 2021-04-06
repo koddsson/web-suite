@@ -1,6 +1,9 @@
 import fetch from 'node-fetch'
 import express, {Request} from 'express'
 import bodyParser from 'body-parser'
+import Handlebars from 'handlebars'
+import markdown from '@koddsson/helper-markdown'
+import {symlinkSync, readFileSync, writeFileSync, unlinkSync} from 'fs'
 
 import * as db from './database.js'
 
@@ -35,6 +38,48 @@ interface NotePayload {
   'in-reply-to': string
 }
 
+interface Note {
+  id: string
+  contents: string
+  location: string | null
+  categories: string
+  timestamp: string
+  replyTo: string | null
+}
+
+async function saveNoteToDatabase(note: Note) {
+  await db.run(
+    'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
+    note.id,
+    note.contents,
+    note.location,
+    note.categories,
+    note.timestamp,
+    note.replyTo
+  )
+  saveNoteToDisk(note)
+}
+
+Handlebars.registerHelper('markdown', markdown({linkify: true}))
+const noteTemplate = Handlebars.compile(readFileSync('./src/views/partials/note.hbs', {encoding: 'utf8'}))
+
+function saveNoteToDisk(note: Note) {
+  // Write the current note under the timestamp and slug if it differs from the timestamp
+  writeFileSync(`./data/notes/${note.timestamp}.json`, JSON.stringify(note, null, 4), {encoding: 'utf8'})
+  writeFileSync(`./data/notes/${note.timestamp}.html`, noteTemplate(note), {encoding: 'utf8'})
+  if (note.id !== note.timestamp) {
+    unlinkSync(`./data/notes/${note.id}.json`)
+    unlinkSync(`./data/notes/${note.id}.html`)
+    symlinkSync(`./${note.timestamp}.json`, `./data/notes/${note.id}.json`)
+    symlinkSync(`./${note.timestamp}.html`, `./data/notes/${note.id}.html`)
+  }
+  // Symlink the note to the latest tag
+  unlinkSync(`./data/notes/latest.json`)
+  unlinkSync(`./data/notes/latest.html`)
+  symlinkSync(`./${note.timestamp}.json`, `./data/notes/latest.json`)
+  symlinkSync(`./${note.timestamp}.html`, `./data/notes/latest.html`)
+}
+
 app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   // Handle authorization
   const response = await fetch('https://tokens.indieauth.com/token', {
@@ -65,16 +110,15 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   } else if (req.body['in-reply-to']) {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
-    const note = req.body.content
-    await db.run(
-      'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
-      id,
-      note,
-      req.body.location,
+
+    await saveNoteToDatabase({
+      id: id.toString(),
+      contents: req.body.content,
+      location: req.body.location,
       categories,
-      timestamp,
-      req.body['in-reply-to']
-    )
+      timestamp: timestamp.toString(),
+      replyTo: req.body['in-reply-to']
+    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
@@ -84,16 +128,15 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   } else if (req.body.h === 'entry') {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
-    const note = req.body.content
-    await db.run(
-      'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
-      id,
-      note,
-      req.body.location,
+
+    await saveNoteToDatabase({
+      id: id.toString(),
+      contents: req.body.content,
+      location: req.body.location,
       categories,
-      timestamp,
-      null
-    )
+      timestamp: timestamp.toString(),
+      replyTo: null
+    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
@@ -111,7 +154,14 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
       await db.run('INSERT INTO photos VALUES (?, ?, ?)', timestamp, photo.value, photo.alt)
     }
 
-    await db.run('INSERT INTO notes VALUES (?, ?, ?, ?, ?)', id, content, null, categories, timestamp)
+    await saveNoteToDatabase({
+      id: id.toString(),
+      contents: content,
+      location: null,
+      categories,
+      timestamp: timestamp.toString(),
+      replyTo: null
+    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
