@@ -36,24 +36,29 @@ interface NotePayload {
 }
 
 interface Note {
-  id: string
+  slug: string
+  id?: string
   contents: string
   location: string | null
   categories: string
-  timestamp: string
-  replyTo: string | null
+  replyTo?: string
 }
 
 async function saveNoteToDatabase(note: Note) {
+  const timestamp = Math.floor(Number(new Date()) / 1000)
+  const id = note.slug || timestamp
+
   await db.run(
     'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
-    note.id,
+    id,
     note.contents,
     note.location,
     note.categories,
-    note.timestamp,
+    timestamp,
     note.replyTo
   )
+
+  return {id, timestamp}
 }
 
 app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
@@ -71,7 +76,6 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   }
 
   const categories = (req.body.category || []).join(',')
-  const slug = req.body['mp-slug']
 
   // Don't remove this. It's good to know what requests look like in the logs
   console.log(req.body)
@@ -84,15 +88,11 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
     res.header('Location', 'https://koddsson.com/favorites')
     return res.status(201).send('Favorited')
   } else if (req.body['in-reply-to']) {
-    const timestamp = Math.floor(Number(new Date()) / 1000)
-    const id = slug || timestamp
-
-    await saveNoteToDatabase({
-      id: id.toString(),
+    const {id} = await saveNoteToDatabase({
+      slug: req.body['mp-slug'],
       contents: req.body.content,
       location: req.body.location,
       categories,
-      timestamp: timestamp.toString(),
       replyTo: req.body['in-reply-to']
     })
 
@@ -102,16 +102,11 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
     res.header('Location', noteLink)
     return res.status(201).send('Note posted')
   } else if (req.body.h === 'entry') {
-    const timestamp = Math.floor(Number(new Date()) / 1000)
-    const id = slug || timestamp
-
-    await saveNoteToDatabase({
-      id: id.toString(),
+    const {id} = await saveNoteToDatabase({
+      slug: req.body['mp-slug'],
       contents: req.body.content,
       location: req.body.location,
-      categories,
-      timestamp: timestamp.toString(),
-      replyTo: null
+      categories
     })
 
     const noteLink = `https://koddsson.com/notes/${id}`
@@ -120,24 +115,20 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
     res.header('Location', noteLink)
     return res.status(201).send('Note posted')
   } else if (req.body.type && req.body.type.includes('h-entry')) {
-    const timestamp = Math.floor(Number(new Date()) / 1000)
-    const id = slug || timestamp
     const properties = req.body.properties
     const photo = properties.photo && properties.photo[0]
     const content = properties.content[0]
 
+    const {id, timestamp} = await saveNoteToDatabase({
+      slug: req.body['mp-slug'],
+      contents: content,
+      location: null,
+      categories
+    })
+
     if (photo) {
       await db.run('INSERT INTO photos VALUES (?, ?, ?)', timestamp, photo.value, photo.alt)
     }
-
-    await saveNoteToDatabase({
-      id: id.toString(),
-      contents: content,
-      location: null,
-      categories,
-      timestamp: timestamp.toString(),
-      replyTo: null
-    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
