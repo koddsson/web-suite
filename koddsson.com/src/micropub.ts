@@ -7,15 +7,6 @@ import * as db from './database.js'
 const app = express()
 app.use(bodyParser.json())
 
-app.get('/', async (req, res) => {
-  if (req.query['q'] === 'config') {
-    return res.json({
-      'media-endpoint': 'https://img.koddsson.com/upload'
-    })
-  }
-  return res.status(404).send('Not found')
-})
-
 interface AuthResponse {
   me: string
 }
@@ -43,6 +34,15 @@ interface Note {
   categories: string
   replyTo?: string
 }
+
+app.get('/', async (req, res) => {
+  if (req.query['q'] === 'config') {
+    return res.json({
+      'media-endpoint': 'https://img.koddsson.com/upload'
+    })
+  }
+  return res.status(404).send('Not found')
+})
 
 async function saveNoteToDatabase(note: Note) {
   const timestamp = Math.floor(Number(new Date()) / 1000)
@@ -84,6 +84,7 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
     // TODO: Try and get metadata and add to the table.
     const timestamp = Math.floor(Number(new Date()) / 1000)
     await db.run("INSERT INTO favorites VALUES (?, DateTime('now'), ?)", req.body['like-of'], timestamp)
+
     // TODO: Set this header more correctly
     res.header('Location', 'https://koddsson.com/favorites')
     return res.status(201).send('Favorited')
