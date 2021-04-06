@@ -35,6 +35,27 @@ interface NotePayload {
   'in-reply-to': string
 }
 
+interface Note {
+  id: string
+  contents: string
+  location: string | null
+  categories: string
+  timestamp: string
+  replyTo: string | null
+}
+
+async function saveNoteToDatabase(note: Note) {
+  await db.run(
+    'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
+    note.id,
+    note.contents,
+    note.location,
+    note.categories,
+    note.timestamp,
+    note.replyTo
+  )
+}
+
 app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   // Handle authorization
   const response = await fetch('https://tokens.indieauth.com/token', {
@@ -65,16 +86,15 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   } else if (req.body['in-reply-to']) {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
-    const note = req.body.content
-    await db.run(
-      'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
-      id,
-      note,
-      req.body.location,
+
+    await saveNoteToDatabase({
+      id: id.toString(),
+      contents: req.body.content,
+      location: req.body.location,
       categories,
-      timestamp,
-      req.body['in-reply-to']
-    )
+      timestamp: timestamp.toString(),
+      replyTo: req.body['in-reply-to']
+    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
@@ -84,16 +104,15 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
   } else if (req.body.h === 'entry') {
     const timestamp = Math.floor(Number(new Date()) / 1000)
     const id = slug || timestamp
-    const note = req.body.content
-    await db.run(
-      'INSERT INTO notes VALUES (?, ?, ?, ?, ?, ?)',
-      id,
-      note,
-      req.body.location,
+
+    await saveNoteToDatabase({
+      id: id.toString(),
+      contents: req.body.content,
+      location: req.body.location,
       categories,
-      timestamp,
-      null
-    )
+      timestamp: timestamp.toString(),
+      replyTo: null
+    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
@@ -111,7 +130,14 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
       await db.run('INSERT INTO photos VALUES (?, ?, ?)', timestamp, photo.value, photo.alt)
     }
 
-    await db.run('INSERT INTO notes VALUES (?, ?, ?, ?, ?)', id, content, null, categories, timestamp)
+    await saveNoteToDatabase({
+      id: id.toString(),
+      contents: content,
+      location: null,
+      categories,
+      timestamp: timestamp.toString(),
+      replyTo: null
+    })
 
     const noteLink = `https://koddsson.com/notes/${id}`
 
