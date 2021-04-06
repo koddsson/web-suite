@@ -3,7 +3,7 @@
 :root {
   --background-color: #ffffff;
   --color-light-gray: #fafafa;
-  --color-gray: #EEF0F2;
+  --color-gray: #eef0f2;
   --text-color: #191919;
 }
 
@@ -28,11 +28,13 @@ li {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   padding: 0;
   margin: 0;
@@ -50,13 +52,20 @@ a {
   text-decoration: underline;
   text-decoration-skip-ink: auto;
 }
-      
-.timestamp { float: right;}
+
+.timestamp {
+  text-align: right;
+}
 
 .post {
   display: flex;
   flex-direction: column;
   padding: 0.83em 0;
+}
+
+.body {
+  border-bottom: 1px dotted lightgray;
+  margin-bottom: 15px;
 }
 
 .post.small > .body {
