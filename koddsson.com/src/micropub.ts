@@ -87,26 +87,13 @@ app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
     // TODO: Set this header more correctly
     res.header('Location', 'https://koddsson.com/favorites')
     return res.status(201).send('Favorited')
-  } else if (req.body['in-reply-to']) {
+  } else if (req.body['in-reply-to'] || req.body.h === 'entry') {
     const {id} = await saveNoteToDatabase({
       slug: req.body['mp-slug'],
       contents: req.body.content,
       location: req.body.location,
       categories,
       replyTo: req.body['in-reply-to']
-    })
-
-    const noteLink = `https://koddsson.com/notes/${id}`
-
-    // TODO: Set this header more correctly
-    res.header('Location', noteLink)
-    return res.status(201).send('Note posted')
-  } else if (req.body.h === 'entry') {
-    const {id} = await saveNoteToDatabase({
-      slug: req.body['mp-slug'],
-      contents: req.body.content,
-      location: req.body.location,
-      categories
     })
 
     const noteLink = `https://koddsson.com/notes/${id}`
