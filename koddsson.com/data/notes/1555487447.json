@@ -1,0 +1,8 @@
+{
+    "slug": "1555487447",
+    "content": "I made a simple tool to help me add `Coauthored-by:` trailers to my git commits when working with other people since I kept forgetting to. You can run it with `npx`  so no installation required if you have npm.\n\n`npx coworking-with -h` to get started\n\nhttps://github.com/koddsson/coworking-with",
+    "geourl": null,
+    "categories": null,
+    "timestamp": 1555487447,
+    "replyTo": null
+}

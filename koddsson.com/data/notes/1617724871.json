@@ -1,0 +1,8 @@
+{
+    "slug": "1617724871",
+    "content": "# Web Components are supported in all modern major browsers\r\n\r\n\"Web Components\" and \"Modern Major Browsers\" are both moving targets, so this might not always be true, but Web Components can be shipped to most users for basic usability.\r\n\r\n|  | Chrome | Edge | Firefox | IE | Opera | Safari |\r\n|:-|:-:|:-:|:-:|:-:|:-:|:-:|\r\n|`customElements` |  54 | 79 | 63 | No | 41 | 10.1 |\r\n| `ShadowRoot` | 53 | 79 | 63 | No | 40 | 10.1 |\r\n\r\nIf there was a real need to support older browsers, you could resort to using a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements), but that comes with its own [limitations](https://github.com/webcomponents/polyfills/tree/master/packages/custom-elements#known-bugs-and-limitations).\r\n\r\n## References\r\n‘Window.CustomElements - Web APIs | MDN’. n.d. Accessed 30 March 2021. [https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements](https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements).\r\n\r\n‘ShadowRoot - Web APIs | MDN’. n.d. Accessed 30 March 2021. [https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot).",
+    "geourl": null,
+    "categories": "",
+    "timestamp": 1617724871,
+    "replyTo": null
+}

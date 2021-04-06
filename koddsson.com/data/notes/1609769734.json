@@ -1,0 +1,8 @@
+{
+    "slug": "1609769734",
+    "content": "Using the operating system fonts on a website instead of loading a web font is much more feasible in 2020 than in previous years since [system fonts have gotten much better](https://systemfontstack.com/).\r\n\r\nLoading system fonts instead of web fonts are preferable if possible for Web Performance since there is no network request required to get the font and the end-user will avoid a potential [Flash Of Unstyled Text](https://css-tricks.com/how-to-load-fonts-in-a-way-that-fights-fout-and-makes-lighthouse-happy/).",
+    "geourl": null,
+    "categories": "",
+    "timestamp": 1609769734,
+    "replyTo": null
+}

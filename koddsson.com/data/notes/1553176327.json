@@ -1,0 +1,8 @@
+{
+    "slug": "1553176327",
+    "content": "Wrote a little script that will append `Coauthored-by: [..]` strings to your commit messages while you are in \"coworking mode\". Super useful if you pair a lot with people and forget to add the `Coauthored-by` signatures a lot. https://github.com/koddsson/coworking-with",
+    "geourl": null,
+    "categories": null,
+    "timestamp": 1553176327,
+    "replyTo": null
+}
