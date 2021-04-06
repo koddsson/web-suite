@@ -1,6 +1,9 @@
 import fetch from 'node-fetch'
 import express, {Request} from 'express'
 import bodyParser from 'body-parser'
+import Handlebars from 'handlebars'
+import markdown from '@koddsson/helper-markdown'
+import {symlinkSync, readFileSync, writeFileSync, unlinkSync} from 'fs'
 
 import * as db from './database.js'
 
@@ -54,6 +57,27 @@ async function saveNoteToDatabase(note: Note) {
     note.timestamp,
     note.replyTo
   )
+  saveNoteToDisk(note)
+}
+
+Handlebars.registerHelper('markdown', markdown({linkify: true}))
+const noteTemplate = Handlebars.compile(readFileSync('./src/views/partials/note.hbs', {encoding: 'utf8'}))
+
+function saveNoteToDisk(note: Note) {
+  // Write the current note under the timestamp and slug if it differs from the timestamp
+  writeFileSync(`./data/notes/${note.timestamp}.json`, JSON.stringify(note, null, 4), {encoding: 'utf8'})
+  writeFileSync(`./data/notes/${note.timestamp}.html`, noteTemplate(note), {encoding: 'utf8'})
+  if (note.id !== note.timestamp) {
+    unlinkSync(`./data/notes/${note.id}.json`)
+    unlinkSync(`./data/notes/${note.id}.html`)
+    symlinkSync(`./${note.timestamp}.json`, `./data/notes/${note.id}.json`)
+    symlinkSync(`./${note.timestamp}.html`, `./data/notes/${note.id}.html`)
+  }
+  // Symlink the note to the latest tag
+  unlinkSync(`./data/notes/latest.json`)
+  unlinkSync(`./data/notes/latest.html`)
+  symlinkSync(`./${note.timestamp}.json`, `./data/notes/latest.json`)
+  symlinkSync(`./${note.timestamp}.html`, `./data/notes/latest.html`)
 }
 
 app.post('/', async (req: Request<unknown, unknown, NotePayload>, res) => {
