@@ -1,4 +1,4 @@
-import sqlite3 from 'sqlite3'
+import sqlite3 from '@vscode/sqlite3'
 import {open} from 'sqlite'
 
 export async function all<T>(statement: string, ...args: unknown[]): Promise<T[]> {
